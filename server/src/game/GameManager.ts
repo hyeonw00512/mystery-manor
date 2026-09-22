@@ -16,4 +16,5 @@ export class GameManager {
 
   getByCode(roomCode: string): GameRoom | undefined { return this.roomsByCode.get(normalizeRoomCode(roomCode)); }
   getById(roomId: string): GameRoom | undefined { return this.roomsById.get(roomId); }
+  listRooms(): GameRoom[] { return [...this.roomsByCode.values()]; }
 }
