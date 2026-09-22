@@ -1,0 +1,16 @@
+{
+  "name": "mystery-manor",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["shared", "server", "client"],
+  "scripts": {
+    "dev": "concurrently -n shared,server,client -c magenta,yellow,cyan \"npm run dev -w @mystery/shared\" \"npm run dev -w @mystery/server\" \"npm run dev -w @mystery/client\"",
+    "build": "npm run build -w @mystery/shared && npm run build -w @mystery/server && npm run build -w @mystery/client",
+    "test": "npm run build -w @mystery/shared && npm test -w @mystery/server",
+    "start": "npm run start -w @mystery/server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": { "node": ">=20" }
+}
