@@ -38,6 +38,12 @@ export function registerSocketHandlers(io: Server, socket: AppSocket, games: Gam
     if (!room || !playerId || room.getPlayer(playerId)?.socketId !== socket.id) throw new Error("유효한 방 세션이 없습니다.");
     return { room, playerId };
   };
+  const ownSpectatorRoom = () => {
+    const { roomId, playerId } = socket.data;
+    const room = roomId ? games.getById(roomId) : undefined;
+    if (!room || !playerId || room.getSpectator(playerId)?.socketId !== socket.id) throw new Error("유효한 관전 세션이 없습니다.");
+    return { room, playerId };
+  };
   const record = (value: unknown, label: string): Record<string, unknown> => {
     if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`${label} 요청 형식이 올바르지 않습니다.`);
     return value as Record<string, unknown>;
@@ -56,8 +62,13 @@ export function registerSocketHandlers(io: Server, socket: AppSocket, games: Gam
   }));
   socket.on("platform:join", (payload: { joinToken: string }, ack: (result: Ack<SessionCredentials>) => void) => safe(ack, () => {
     const token = verifyPlatformJoinToken(text(record(payload, "플랫폼 입장").joinToken, "입장 토큰"));
-    if (token.mode === "SPECTATOR") throw new Error("흑야 저택 관전 기능은 준비 중입니다.");
     const room = games.getByCode(token.roomCode); if (!room) throw new Error("존재하지 않는 방입니다.");
+    if (token.mode === "SPECTATOR") {
+      const spectator = room.spectate(token.nickname, socket.id);
+      bind(room.roomId, spectator.playerId);
+      queueMicrotask(() => emitState(room.roomId));
+      return room.getSession(spectator.playerId);
+    }
     const player = room.join(token.nickname, socket.id); bind(room.roomId, player.playerId); queueMicrotask(() => emitState(room.roomId)); return room.getSession(player.playerId);
   }));
 
@@ -70,12 +81,24 @@ export function registerSocketHandlers(io: Server, socket: AppSocket, games: Gam
     queueMicrotask(() => emitState(room.roomId));
     return room.getSession(player.playerId);
   }));
+  socket.on("room:spectate", (payload: { nickname: string; roomCode: string }, ack: (result: Ack<SessionCredentials>) => void) => safe(ack, () => {
+    const body=record(payload,"관전 입장"), room=games.getByCode(text(body.roomCode,"방 코드")); if(!room) throw new Error("존재하지 않는 방 코드입니다.");
+    const spectator=room.spectate(text(body.nickname,"닉네임"),socket.id); bind(room.roomId,spectator.playerId); queueMicrotask(()=>emitState(room.roomId)); return room.getSession(spectator.playerId);
+  }));
 
   socket.on(CLIENT_EVENTS.RECONNECT_ROOM, (payload: SessionCredentials, ack: (result: Ack<SessionCredentials>) => void) => safe(ack, () => {
     const body = record(payload, "재접속");
     const room = games.getById(text(body.roomId, "방 ID"));
     if (!room || room.roomCode !== text(body.roomCode, "방 코드")) throw new Error("기존 방을 찾을 수 없습니다.");
-    const player = room.reconnect(text(body.playerId, "플레이어 ID"), text(body.sessionToken, "세션 토큰"), socket.id);
+    const playerId = text(body.playerId, "플레이어 ID");
+    const sessionToken = text(body.sessionToken, "세션 토큰");
+    if (body.isSpectator === true) {
+      const spectator = room.reconnectSpectator(playerId, sessionToken, socket.id);
+      bind(room.roomId, spectator.playerId);
+      queueMicrotask(() => emitState(room.roomId));
+      return room.getSession(spectator.playerId);
+    }
+    const player = room.reconnect(playerId, sessionToken, socket.id);
     bind(room.roomId, player.playerId);
     queueMicrotask(() => { emitState(room.roomId); io.to(socket.id).emit(SERVER_EVENTS.PRIVATE_STATE, room.getPrivateState(player.playerId)); });
     return room.getSession(player.playerId);
@@ -145,12 +168,18 @@ export function registerSocketHandlers(io: Server, socket: AppSocket, games: Gam
   }));
 
   socket.on(CLIENT_EVENTS.CHAT_MESSAGE, (message: string, ack: (result: Ack<ChatMessage>) => void) => safe(ack, () => {
-    const { room, playerId } = ownRoom(); const chat = room.addChat(playerId, text(message, "메시지")); io.to(room.roomId).emit(SERVER_EVENTS.CHAT_MESSAGE, chat); return chat;
+    const body = text(message, "메시지");
+    const { roomId, playerId } = socket.data;
+    const room = roomId ? games.getById(roomId) : undefined;
+    if (!room || !playerId) throw new Error("유효한 방 세션이 없습니다.");
+    const chat = room.getPlayer(playerId)?.socketId === socket.id ? room.addChat(playerId, body) : ownSpectatorRoom().room.addSpectatorChat(playerId, body);
+    io.to(room.roomId).emit(SERVER_EVENTS.CHAT_MESSAGE, chat); return chat;
   }));
 
   socket.on("disconnect", () => {
     const { roomId, playerId } = socket.data;
     const room = roomId ? games.getById(roomId) : undefined;
     if (room && playerId && room.getPlayer(playerId)?.socketId === socket.id) { room.disconnect(playerId); emitState(room.roomId); }
+    else if (room && playerId && room.getSpectator(playerId)?.socketId === socket.id) { room.disconnectSpectator(playerId); emitState(room.roomId); }
   });
 }

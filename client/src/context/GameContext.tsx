@@ -14,7 +14,7 @@ const reportActivity = (status: "LOBBY" | "PLAYING", force = false) => {
 interface GameContextValue {
   connected: boolean; restoring: boolean; room: PublicRoomState | null; privateState: PrivatePlayerState | null; session: SessionCredentials | null;
   chat: ChatMessage[]; error: string | null; revealedCard: RevealedCardInfo | null; dismissError: () => void; dismissRevealedCard: () => void;
-  createRoom: (nickname: string) => Promise<boolean>; joinRoom: (nickname: string, roomCode: string) => Promise<boolean>;
+  createRoom: (nickname: string) => Promise<boolean>; joinRoom: (nickname: string, roomCode: string) => Promise<boolean>; spectateRoom: (nickname: string, roomCode: string) => Promise<boolean>;
   selectCharacter: (characterId: string) => Promise<boolean>; setReady: (ready: boolean) => Promise<boolean>;
   startGame: () => Promise<boolean>; rollDice: () => Promise<boolean>; movePlayer: (nodeId: string) => Promise<boolean>; endTurn: () => Promise<boolean>;
   makeSuggestion: (selection: SuggestionSelection) => Promise<boolean>; revealCard: (suggestionId: string, cardId: string) => Promise<boolean>;
@@ -79,6 +79,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     connected, restoring, room, privateState, session, chat, error, revealedCard, dismissError: () => setError(null), dismissRevealedCard: () => setRevealedCard(null),
     createRoom: (nickname) => enter(CLIENT_EVENTS.CREATE_ROOM, { nickname }),
     joinRoom: (nickname, roomCode) => enter(CLIENT_EVENTS.JOIN_ROOM, { nickname, roomCode }),
+    spectateRoom: (nickname, roomCode) => enter("room:spectate", { nickname, roomCode }),
     selectCharacter: (id) => simple(CLIENT_EVENTS.SELECT_CHARACTER, id), setReady: (ready) => simple(CLIENT_EVENTS.PLAYER_READY, ready),
     startGame: () => simple(CLIENT_EVENTS.START_GAME), rollDice: () => simple(CLIENT_EVENTS.ROLL_DICE),
     movePlayer: (nodeId) => simple(CLIENT_EVENTS.MOVE_PLAYER, nodeId), endTurn: () => simple(CLIENT_EVENTS.END_TURN),

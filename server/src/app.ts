@@ -22,18 +22,18 @@ export function createApp() {
     version: 1,
     gameId: "mystery-manor",
     updatedAt: new Date().toISOString(),
-    capabilities: { canSpectate: false, canReserveNextRound: false },
+    capabilities: { canSpectate: true, canReserveNextRound: false },
     rooms: games.listRooms().map((room) => ({
       roomCode: room.roomCode,
       hostNickname: room.players.get(room.hostPlayerId)?.nickname ?? "알 수 없음",
       playerCount: room.players.size,
       maxPlayers: room.rules.maxPlayers,
-      spectatorCount: 0,
+      spectatorCount: room.spectators.size,
       status: room.status === "LOBBY" ? "WAITING" : room.status === "GAME_OVER" ? "FINISHED" : "PLAYING",
       visibility: "PUBLIC",
       requiresPassword: false,
       canJoin: room.status === "LOBBY" && room.players.size < room.rules.maxPlayers,
-      canSpectate: false,
+      canSpectate: true,
       canReserveNextRound: false,
       joinUrl: `${config.publicUrl}/?room=${encodeURIComponent(room.roomCode)}`
     }))

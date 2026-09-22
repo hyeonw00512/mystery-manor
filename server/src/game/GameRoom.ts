@@ -42,6 +42,13 @@ export interface ServerPlayer {
   notes: Map<string, { mark: NoteMark; memo: string }>;
 }
 
+interface SpectatorSession {
+  playerId: string;
+  sessionToken: string;
+  socketId: string | null;
+  nickname: string;
+}
+
 interface Solution { suspectId: string; locationId: string; itemId: string; }
 interface ActiveSuggestion extends PublicSuggestionState { eligibleCardIds: string[]; }
 
@@ -51,6 +58,7 @@ export class GameRoom {
   readonly roomName: string;
   readonly rules: GameRules;
   readonly players = new Map<string, ServerPlayer>();
+  readonly spectators = new Map<string, SpectatorSession>();
   readonly chat: ChatMessage[] = [];
   readonly logs: GameLogEntry[] = [];
   hostPlayerId: string;
@@ -90,6 +98,28 @@ export class GameRoom {
     this.addLog(`${player.nickname}님이 조사에 합류했습니다.`);
     return player;
   }
+  spectate(nickname: string, socketId: string): SpectatorSession {
+    const cleaned = normalizeNickname(nickname);
+    if (cleaned.length < 2 || cleaned.length > 16) throw new Error("닉네임은 2~16자로 입력해 주세요.");
+    const spectator = { playerId: createId(), sessionToken: createSessionToken(), socketId, nickname: cleaned };
+    this.spectators.set(spectator.playerId, spectator);
+    this.addLog(`${spectator.nickname}님이 관전을 시작했습니다.`);
+    return spectator;
+  }
+
+  reconnectSpectator(playerId: string, sessionToken: string, socketId: string): SpectatorSession {
+    const spectator = this.spectators.get(playerId);
+    if (!spectator || spectator.sessionToken !== sessionToken) throw new Error("관전 재접속 정보가 올바르지 않습니다.");
+    spectator.socketId = socketId;
+    return spectator;
+  }
+
+  disconnectSpectator(playerId: string): void {
+    const spectator = this.spectators.get(playerId);
+    if (spectator) spectator.socketId = null;
+  }
+
+  getSpectator(playerId: string): SpectatorSession | undefined { return this.spectators.get(playerId); }
 
   reconnect(playerId: string, sessionToken: string, socketId: string): ServerPlayer {
     const player = this.players.get(playerId);
@@ -338,7 +368,19 @@ export class GameRoom {
     return chatMessage;
   }
 
+  addSpectatorChat(playerId: string, message: string): ChatMessage {
+    const spectator = this.spectators.get(playerId);
+    if (!spectator) throw new Error("유효한 관전 세션이 아닙니다.");
+    const cleaned = message.trim();
+    if (!cleaned || cleaned.length > 300) throw new Error("메시지는 1~300자로 입력해 주세요.");
+    const chatMessage = { id: createId(), playerId, nickname: `${spectator.nickname} (관전)`, message: cleaned, createdAt: new Date().toISOString() };
+    this.chat.push(chatMessage);
+    if (this.chat.length > 100) this.chat.shift();
+    return chatMessage;
+  }
+
   getSession(playerId: string): SessionCredentials {
+    const spectator=this.spectators.get(playerId); if(spectator) return { roomId:this.roomId, roomCode:this.roomCode, playerId, sessionToken:spectator.sessionToken, isSpectator:true };
     const player = this.requirePlayer(playerId);
     return { roomId: this.roomId, roomCode: this.roomCode, playerId, sessionToken: player.sessionToken };
   }

@@ -8,7 +8,7 @@ export interface BoardNode { id: string; type: BoardNodeType; name?: string; loc
 export interface BoardDefinition { id: string; name: string; width: number; height: number; nodes: BoardNode[]; }
 export interface Character { id: string; name: string; role: string; color: string; initials: string; startNodeId: string; }
 export interface GameRules { minPlayers: number; maxPlayers: number; diceCount: number; secretPassages: boolean; accusationElimination: boolean; autoNotes: boolean; turnTimeLimitSeconds: number; reconnectGraceSeconds: number; }
-export interface SessionCredentials { roomId: string; roomCode: string; playerId: string; sessionToken: string; }
+export interface SessionCredentials { roomId: string; roomCode: string; playerId: string; sessionToken: string; isSpectator?: boolean; }
 export interface PublicPlayer { playerId: string; nickname: string; characterId: string | null; connected: boolean; reconnectDeadlineAt: string | null; eliminated: boolean; ready: boolean; isHost: boolean; cardCount: number; position: string | null; }
 export interface ChatMessage { id: string; playerId: string; nickname: string; message: string; createdAt: string; }
 export interface GameLogEntry { id: string; message: string; createdAt: string; }

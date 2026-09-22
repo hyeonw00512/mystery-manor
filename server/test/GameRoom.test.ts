@@ -240,3 +240,16 @@ test("모든 조사관이 틀린 최종 추리를 하면 승자 없이 게임이
   assert.deepEqual(final, { correct: false, gameOver: true });
   assert.equal(room.getPublicState().gameOver?.winnerPlayerId, null);
 });
+
+test("관전자는 별도 세션으로 재접속하고 개인 게임 정보는 받을 수 없다", () => {
+  const { room } = readyThreePlayers();
+  const spectator = room.spectate("관전자", "spectator-socket");
+  const session = room.getSession(spectator.playerId);
+  assert.equal(session.isSpectator, true);
+  assert.equal(room.spectators.size, 1);
+  room.disconnectSpectator(spectator.playerId);
+  assert.equal(room.getSpectator(spectator.playerId)?.socketId, null);
+  room.reconnectSpectator(spectator.playerId, spectator.sessionToken, "new-spectator-socket");
+  assert.equal(room.getSpectator(spectator.playerId)?.socketId, "new-spectator-socket");
+  assert.throws(() => room.getPrivateState(spectator.playerId), /플레이어/);
+});
