@@ -5,7 +5,7 @@ import { clearSession, loadSession, saveSession } from "../session";
 const activityToken = new URLSearchParams(location.search).get("platformActivityToken");
 const platformUrl = new URLSearchParams(location.search).get("platformUrl");
 let lastActivity = "";
-const reportActivity = (status: "LOBBY" | "PLAYING", force = false) => {
+const reportActivity = (status: "LOBBY" | "PLAYING" | "SPECTATING", force = false) => {
   if (!activityToken || !platformUrl || (!force && lastActivity === status)) return;
   lastActivity = status;
   fetch(new URL("/api/activity", platformUrl), { method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify({ token:activityToken, status }), keepalive:true }).catch(() => { lastActivity = ""; });
@@ -36,7 +36,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [revealedCard, setRevealedCard] = useState<RevealedCardInfo | null>(null);
-  useEffect(() => { const status = !room || room.status === "LOBBY" ? "LOBBY" : "PLAYING"; reportActivity(status); const timer = window.setInterval(() => reportActivity(status, true), 45_000); return () => window.clearInterval(timer); }, [room?.status]);
+  useEffect(() => { const status = session?.isSpectator ? "SPECTATING" : !room || room.status === "LOBBY" ? "LOBBY" : "PLAYING"; reportActivity(status); const timer = window.setInterval(() => reportActivity(status, true), 45_000); return () => window.clearInterval(timer); }, [room?.status, session?.isSpectator]);
 
   const emitAck = useCallback(<T,>(event: string, ...args: unknown[]): Promise<Ack<T>> => new Promise((resolve) => socket.emit(event, ...args, resolve)), []);
 
