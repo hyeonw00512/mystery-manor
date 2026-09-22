@@ -10,5 +10,6 @@ export const config = {
   clientUrl: process.env.CLIENT_URL || process.env.RENDER_EXTERNAL_URL || (nodeEnv === "production" ? `http://localhost:${port}` : "http://localhost:5173"),
   nodeEnv,
   publicUrl,
+  platformJoinSecret: process.env.PLATFORM_JOIN_SECRET || "",
   serveClient: process.env.SERVE_CLIENT !== "false"
 };

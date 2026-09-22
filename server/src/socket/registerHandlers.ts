@@ -1,6 +1,7 @@
 import type { Server, Socket } from "socket.io";
 import { CLIENT_EVENTS, SERVER_EVENTS, type AccusationSelection, type Ack, type ChatMessage, type SessionCredentials, type SuggestionSelection, type UpdateNotePayload } from "@mystery/shared";
 import type { GameManager } from "../game/GameManager.js";
+import { verifyPlatformJoinToken } from "../platform.js";
 
 interface SocketSession { roomId?: string; playerId?: string; }
 type AppSocket = Socket<Record<string, never>, Record<string, (...args: unknown[]) => void>, Record<string, never>, SocketSession>;
@@ -52,6 +53,12 @@ export function registerSocketHandlers(io: Server, socket: AppSocket, games: Gam
     bind(room.roomId, player.playerId);
     queueMicrotask(() => emitState(room.roomId));
     return room.getSession(player.playerId);
+  }));
+  socket.on("platform:join", (payload: { joinToken: string }, ack: (result: Ack<SessionCredentials>) => void) => safe(ack, () => {
+    const token = verifyPlatformJoinToken(text(record(payload, "플랫폼 입장").joinToken, "입장 토큰"));
+    if (token.mode === "SPECTATOR") throw new Error("흑야 저택 관전 기능은 준비 중입니다.");
+    const room = games.getByCode(token.roomCode); if (!room) throw new Error("존재하지 않는 방입니다.");
+    const player = room.join(token.nickname, socket.id); bind(room.roomId, player.playerId); queueMicrotask(() => emitState(room.roomId)); return room.getSession(player.playerId);
   }));
 
   socket.on(CLIENT_EVENTS.JOIN_ROOM, (payload: { nickname: string; roomCode: string }, ack: (result: Ack<SessionCredentials>) => void) => safe(ack, () => {

@@ -19,6 +19,7 @@ interface GameContextValue {
 const GameContext = createContext<GameContextValue | null>(null);
 
 export function GameProvider({ children }: { children: ReactNode }) {
+  const platformJoinToken = new URLSearchParams(location.search).get("joinToken");
   const [connected, setConnected] = useState(socket.connected);
   const [restoring, setRestoring] = useState(true);
   const [room, setRoom] = useState<PublicRoomState | null>(null);
@@ -33,6 +34,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const onConnect = async () => {
       setConnected(true);
+      if (platformJoinToken) { const result = await emitAck<SessionCredentials>("platform:join", { joinToken: platformJoinToken }); if (result.ok) { saveSession(result.data); setSession(result.data); history.replaceState(null, "", `/room/${result.data.roomCode}`); setRestoring(false); return; } setError(result.error); }
       const stored = loadSession();
       if (stored) {
         const result = await emitAck<SessionCredentials>(CLIENT_EVENTS.RECONNECT_ROOM, stored);
