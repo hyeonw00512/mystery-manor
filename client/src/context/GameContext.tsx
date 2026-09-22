@@ -2,6 +2,14 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { CLIENT_EVENTS, SERVER_EVENTS, type AccusationSelection, type Ack, type ChatMessage, type PrivatePlayerState, type PublicRoomState, type RevealedCardInfo, type SessionCredentials, type SuggestionSelection, type UpdateNotePayload } from "@mystery/shared";
 import { socket } from "../socket";
 import { clearSession, loadSession, saveSession } from "../session";
+const activityToken = new URLSearchParams(location.search).get("platformActivityToken");
+const platformUrl = new URLSearchParams(location.search).get("platformUrl");
+let lastActivity = "";
+const reportActivity = (status: "LOBBY" | "PLAYING", force = false) => {
+  if (!activityToken || !platformUrl || (!force && lastActivity === status)) return;
+  lastActivity = status;
+  fetch(new URL("/api/activity", platformUrl), { method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify({ token:activityToken, status }), keepalive:true }).catch(() => { lastActivity = ""; });
+};
 
 interface GameContextValue {
   connected: boolean; restoring: boolean; room: PublicRoomState | null; privateState: PrivatePlayerState | null; session: SessionCredentials | null;
@@ -28,6 +36,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [revealedCard, setRevealedCard] = useState<RevealedCardInfo | null>(null);
+  useEffect(() => { const status = !room || room.status === "LOBBY" ? "LOBBY" : "PLAYING"; reportActivity(status); const timer = window.setInterval(() => reportActivity(status, true), 45_000); return () => window.clearInterval(timer); }, [room?.status]);
 
   const emitAck = useCallback(<T,>(event: string, ...args: unknown[]): Promise<Ack<T>> => new Promise((resolve) => socket.emit(event, ...args, resolve)), []);
 
