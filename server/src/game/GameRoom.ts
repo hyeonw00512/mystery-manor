@@ -121,6 +121,8 @@ export class GameRoom {
 
   getSpectator(playerId: string): SpectatorSession | undefined { return this.spectators.get(playerId); }
 
+  get connectedSpectatorCount(): number { return [...this.spectators.values()].filter((spectator) => spectator.socketId !== null).length; }
+
   reconnect(playerId: string, sessionToken: string, socketId: string): ServerPlayer {
     const player = this.players.get(playerId);
     if (!player || player.sessionToken !== sessionToken) throw new Error("재접속 정보가 올바르지 않습니다.");

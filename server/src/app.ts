@@ -28,7 +28,7 @@ export function createApp() {
       hostNickname: room.players.get(room.hostPlayerId)?.nickname ?? "알 수 없음",
       playerCount: room.players.size,
       maxPlayers: room.rules.maxPlayers,
-      spectatorCount: room.spectators.size,
+      spectatorCount: room.connectedSpectatorCount,
       status: room.status === "LOBBY" ? "WAITING" : room.status === "GAME_OVER" ? "FINISHED" : "PLAYING",
       visibility: "PUBLIC",
       requiresPassword: false,

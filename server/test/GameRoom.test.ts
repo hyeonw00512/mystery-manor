@@ -247,9 +247,12 @@ test("관전자는 별도 세션으로 재접속하고 개인 게임 정보는 �
   const session = room.getSession(spectator.playerId);
   assert.equal(session.isSpectator, true);
   assert.equal(room.spectators.size, 1);
+  assert.equal(room.connectedSpectatorCount, 1);
   room.disconnectSpectator(spectator.playerId);
   assert.equal(room.getSpectator(spectator.playerId)?.socketId, null);
+  assert.equal(room.connectedSpectatorCount, 0);
   room.reconnectSpectator(spectator.playerId, spectator.sessionToken, "new-spectator-socket");
   assert.equal(room.getSpectator(spectator.playerId)?.socketId, "new-spectator-socket");
+  assert.equal(room.connectedSpectatorCount, 1);
   assert.throws(() => room.getPrivateState(spectator.playerId), /플레이어/);
 });
