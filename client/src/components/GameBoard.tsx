@@ -1,6 +1,7 @@
 import { allCards, board, boardEdges, boardNodeById, characters } from "@mystery/shared";
 import { useGame } from "../context/GameContext";
 import { useBoardViewport } from "../hooks/useBoardViewport";
+import { CharacterPortrait } from "./CharacterPortrait";
 
 export function GameBoard() {
   const { room, session, movePlayer } = useGame();
@@ -28,7 +29,7 @@ export function GameBoard() {
           if (!node || !character) return null;
           const occupants = room.players.filter((candidate) => candidate.position === player.position);
           const offset = occupants.findIndex((candidate) => candidate.playerId === player.playerId) * 18 - (occupants.length - 1) * 9;
-          return <div key={player.playerId} className={`player-piece ${player.playerId === session?.playerId ? "is-me" : ""}`} style={{ left: node.x + offset, top: node.y, "--piece-color": character.color } as React.CSSProperties} title={`${player.nickname} · ${character.name}`}><span>{character.initials}</span><small>{player.nickname}</small></div>;
+          return <div key={player.playerId} className={`player-piece ${player.playerId === session?.playerId ? "is-me" : ""}`} style={{ left: node.x + offset, top: node.y, "--piece-color": character.color } as React.CSSProperties} title={`${player.nickname} · ${character.name}`}><CharacterPortrait className="board-character-portrait" characterId={character.id} initials={character.initials}/><small>{player.nickname}</small></div>;
         })}
         {activeSuggestion && <div className="suggestion-flash" role="status"><span>추리 제안</span><strong>{suggestedCards.join(" · ")}</strong></div>}
       </div>
