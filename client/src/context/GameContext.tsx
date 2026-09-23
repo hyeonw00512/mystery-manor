@@ -37,6 +37,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [revealedCard, setRevealedCard] = useState<RevealedCardInfo | null>(null);
   useEffect(() => { const status = session?.isSpectator ? "SPECTATING" : !room || room.status === "LOBBY" ? "LOBBY" : "PLAYING"; reportActivity(status); const timer = window.setInterval(() => reportActivity(status, true), 45_000); return () => window.clearInterval(timer); }, [room?.status, session?.isSpectator]);
+  useEffect(() => {
+    const resumeConnection = () => {
+      if (document.visibilityState === "visible" && !socket.connected) socket.connect();
+    };
+    document.addEventListener("visibilitychange", resumeConnection);
+    return () => document.removeEventListener("visibilitychange", resumeConnection);
+  }, []);
 
   const emitAck = useCallback(<T,>(event: string, ...args: unknown[]): Promise<Ack<T>> => new Promise((resolve) => socket.emit(event, ...args, resolve)), []);
 

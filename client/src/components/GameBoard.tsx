@@ -13,7 +13,7 @@ export function GameBoard() {
   const activeSuggestion = room?.activeSuggestion;
   const suggestedCards = activeSuggestion ? [activeSuggestion.suspectId, activeSuggestion.locationId, activeSuggestion.itemId].map((id) => allCards.find((card) => card.id === id)?.name).filter(Boolean) : [];
   return <section className="board-panel" aria-label="흑야 저택 게임 보드">
-    <div className="board-toolbar"><div><span className="eyebrow">INVESTIGATION MAP</span><strong>{board.name}</strong></div><div className="zoom-controls"><button onClick={() => zoomBy(.85)} aria-label="축소">−</button><button onClick={focusMyPiece} disabled={!myPosition} aria-label="내 위치 중심으로 이동">내 위치</button><button onClick={reset} aria-label="화면에 맞추기">맞춤</button><button onClick={() => zoomBy(1.18)} aria-label="확대">＋</button></div></div>
+    <div className="board-toolbar"><div><span className="eyebrow">INVESTIGATION MAP</span><strong>{board.name}</strong><small className="mobile-orientation-note">가로 화면 권장</small></div><div className="zoom-controls"><button onClick={() => zoomBy(.85)} aria-label="축소">−</button><button onClick={focusMyPiece} disabled={!myPosition} aria-label="내 위치 중심으로 이동">내 위치</button><button onClick={reset} aria-label="화면에 맞추기">맞춤</button><button onClick={() => zoomBy(1.18)} aria-label="확대">＋</button></div></div>
     <div className="board-viewport" ref={viewportRef} {...handlers}>
       <div className="board-stage" style={{ width: board.width, height: board.height, transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})` }}>
         <div className="board-compass" aria-hidden="true"><span>N</span><i/></div>
