@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { basename, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import cors from "cors";
 import express from "express";
@@ -42,10 +42,20 @@ export function createApp() {
   // Resolve from this module, not process.cwd(): npm workspaces start the server from /server.
   const clientDist = fileURLToPath(new URL("../../client/dist", import.meta.url));
   if (config.serveClient && existsSync(clientDist)) {
-    app.use(express.static(clientDist));
+    app.use(express.static(clientDist, {
+      setHeaders(response, filePath) {
+        if (filePath.includes(`${sep}assets${sep}`)) {
+          response.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        } else if (basename(filePath) === "index.html") {
+          response.setHeader("Cache-Control", "no-cache");
+        }
+      }
+    }));
     // React routes such as /room/AB12CD must return the Vite entry document.
     app.use((request, response, next) => {
-      if (request.method === "GET" && request.accepts("html")) response.sendFile(resolve(clientDist, "index.html"));
+      if (request.method === "GET" && request.accepts("html")) response.sendFile(resolve(clientDist, "index.html"), {
+        headers: { "Cache-Control": "no-cache" }
+      });
       else next();
     });
   }
