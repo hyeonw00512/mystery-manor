@@ -1,4 +1,5 @@
 import type { Card } from "@mystery/shared";
+import type { CSSProperties } from "react";
 
 type ArtPosition = { sheet: "suspects" | "locations" | "items"; column: number; row: number; rows: number };
 
@@ -12,12 +13,18 @@ const ART: Record<string, ArtPosition> = {
   item_cane: { sheet: "items", column: 0, row: 1, rows: 2 }, item_letter: { sheet: "items", column: 1, row: 1, rows: 2 }, item_gear: { sheet: "items", column: 2, row: 1, rows: 2 }
 };
 
+const SUSPECT_COLORS: Record<string, string> = {
+  suspect_archivist: "#e34b52", suspect_cartographer: "#3778e6", suspect_botanist: "#27a66d",
+  suspect_watchmaker: "#e5a72f", suspect_reporter: "#9a5be0", suspect_curator: "#20afce"
+};
+
 export function CardIllustration({ card, className = "" }: { card: Card; className?: string }) {
   const art = ART[card.id];
   if (!art) return <span className={`card-illustration fallback ${className}`} aria-hidden="true">{card.icon}</span>;
   return <span className={`card-illustration ${className}`} aria-hidden="true" style={{
     backgroundImage: `url(/card-art/${art.sheet}-sheet.png)`,
     backgroundSize: `300% ${art.rows * 100}%`,
-    backgroundPosition: `${art.column * 50}% ${art.row * (100 / (art.rows - 1))}%`
-  }} />;
+    backgroundPosition: `${art.column * 50}% ${art.row * (100 / (art.rows - 1))}%`,
+    "--identity-color": SUSPECT_COLORS[card.id] ?? "#d5aa62"
+  } as CSSProperties} />;
 }
