@@ -5,11 +5,12 @@ import { clearSession, loadSession, saveSession } from "../session";
 const activityToken = new URLSearchParams(location.search).get("platformActivityToken");
 const platformUrl = new URLSearchParams(location.search).get("platformUrl");
 let lastActivity = "";
-const reportActivity = (status: "LOBBY" | "PLAYING" | "SPECTATING", force = false) => {
+const reportActivity = (status: "LOBBY" | "PLAYING" | "SPECTATING" | "OFFLINE", force = false) => {
   if (!activityToken || !platformUrl || (!force && lastActivity === status)) return;
   lastActivity = status;
   fetch(new URL("/api/activity", platformUrl), { method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify({ token:activityToken, status }), keepalive:true }).catch(() => { lastActivity = ""; });
 };
+window.addEventListener("pagehide", () => reportActivity("OFFLINE", true));
 
 interface GameContextValue {
   connected: boolean; restoring: boolean; room: PublicRoomState | null; privateState: PrivatePlayerState | null; session: SessionCredentials | null;
