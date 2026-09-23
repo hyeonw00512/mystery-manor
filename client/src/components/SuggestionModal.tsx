@@ -1,6 +1,7 @@
 import { boardNodeById, items, locations, suspects } from "@mystery/shared";
 import { useState, type FormEvent } from "react";
 import { useGame } from "../context/GameContext";
+import { CardIllustration } from "./CardIllustration";
 
 export function SuggestionModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { room, session, makeSuggestion } = useGame();
@@ -23,12 +24,12 @@ export function CardResponseModal() {
   const pending = privateState?.pendingReveal;
   if (!pending) return null;
   const choose = async (cardId: string) => { setBusy(true); try { await revealCard(pending.suggestionId, cardId); } finally { setBusy(false); } };
-  return <div className="modal-backdrop urgent" role="presentation"><section className="case-modal reveal-choice" role="dialog" aria-modal="true" aria-labelledby="reveal-title"><span className="eyebrow">PRIVATE RESPONSE</span><h2 id="reveal-title">보여줄 카드를 선택하세요</h2><p><strong>{pending.suggesterNickname}</strong>님에게만 선택한 카드 한 장이 공개됩니다.</p><div className="reveal-options">{pending.cards.map((card) => <button key={card.id} disabled={busy} onClick={() => void choose(card.id)}><span>{card.icon}</span><small>{card.type === "SUSPECT" ? "용의자" : card.type === "LOCATION" ? "장소" : "도구"}</small><strong>{card.name}</strong></button>)}</div></section></div>;
+  return <div className="modal-backdrop urgent" role="presentation"><section className="case-modal reveal-choice" role="dialog" aria-modal="true" aria-labelledby="reveal-title"><span className="eyebrow">PRIVATE RESPONSE</span><h2 id="reveal-title">보여줄 카드를 선택하세요</h2><p><strong>{pending.suggesterNickname}</strong>님에게만 선택한 카드 한 장이 공개됩니다.</p><div className="reveal-options">{pending.cards.map((card) => <button key={card.id} disabled={busy} onClick={() => void choose(card.id)}><CardIllustration card={card} /><small>{card.type === "SUSPECT" ? "용의자" : card.type === "LOCATION" ? "장소" : "도구"}</small><strong>{card.name}</strong></button>)}</div></section></div>;
 }
 
 export function RevealedCardModal() {
   const { revealedCard, dismissRevealedCard } = useGame();
   if (!revealedCard) return null;
   const { card } = revealedCard;
-  return <div className="modal-backdrop private-result" role="presentation"><section className="case-modal revealed-result" role="dialog" aria-modal="true" aria-labelledby="revealed-title"><span className="eyebrow">CONFIDENTIAL EVIDENCE</span><h2 id="revealed-title">카드 한 장을 확인했습니다</h2><p><strong>{revealedCard.fromNickname}</strong>님이 보여준 카드입니다. 이 내용은 다른 플레이어에게 공개되지 않습니다.</p><article className={`revealed-card ${card.type.toLowerCase()}`}><span className="card-icon">{card.icon}</span><small>{card.type === "SUSPECT" ? "용의자" : card.type === "LOCATION" ? "장소" : "도구"}</small><strong>{card.name}</strong></article><button className="primary-button" onClick={dismissRevealedCard}>확인 완료</button></section></div>;
+  return <div className="modal-backdrop private-result" role="presentation"><section className="case-modal revealed-result" role="dialog" aria-modal="true" aria-labelledby="revealed-title"><span className="eyebrow">CONFIDENTIAL EVIDENCE</span><h2 id="revealed-title">카드 한 장을 확인했습니다</h2><p><strong>{revealedCard.fromNickname}</strong>님이 보여준 카드입니다. 이 내용은 다른 플레이어에게 공개되지 않습니다.</p><article className={`revealed-card ${card.type.toLowerCase()}`}><CardIllustration card={card} /><small>{card.type === "SUSPECT" ? "용의자" : card.type === "LOCATION" ? "장소" : "도구"}</small><strong>{card.name}</strong></article><button className="primary-button" onClick={dismissRevealedCard}>확인 완료</button></section></div>;
 }
