@@ -36,23 +36,25 @@
 .board-viewport { position: relative; overflow: hidden; touch-action: none; cursor: grab; user-select: none; background: radial-gradient(circle at center, rgba(39,55,60,.23), transparent 65%), #080c10; }
 .board-viewport:active { cursor: grabbing; }
 .mobile-orientation-note { display:none; }
-.board-stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; background: linear-gradient(rgba(206,188,151,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(206,188,151,.025) 1px, transparent 1px), radial-gradient(circle at center, #172129, #0f151b 72%); background-size: 25px 25px,25px 25px,auto; box-shadow: inset 0 0 100px rgba(0,0,0,.7),0 30px 80px rgba(0,0,0,.45); }
-.board-stage:before { content: ""; position: absolute; inset: 20px; border: 1px solid rgba(213,170,98,.14); pointer-events: none; }
-.board-stage:after { content: "CASE MAP // MM-01"; position: absolute; left: 32px; bottom: 24px; color: rgba(213,170,98,.2); font: 11px ui-monospace,monospace; letter-spacing: .18em; }
+.board-stage { position: absolute; left: 0; top: 0; overflow: hidden; transform-origin: 0 0; background: #071017 url("/manor-board-v2.png") center/100% 100% no-repeat; box-shadow: inset 0 0 120px rgba(0,0,0,.72),0 30px 80px rgba(0,0,0,.45); }
+.board-stage:before { content: ""; position: absolute; inset: 14px; z-index: 1; border: 1px solid rgba(222,181,95,.35); box-shadow: inset 0 0 0 4px rgba(5,9,14,.3); pointer-events: none; }
+.board-stage:after { content: "흑야 저택 · 사건 지도"; position: absolute; left: 28px; bottom: 25px; z-index: 4; color: rgba(241,213,151,.72); font: 11px "Song Myung",serif; letter-spacing: .18em; text-shadow: 0 2px 7px #000; }
 .board-connections { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.board-connections line { stroke: rgba(174,158,126,.28); stroke-width: 7; stroke-linecap: round; }
+.board-connections line { stroke: rgba(241,218,163,.16); stroke-width: 5; stroke-linecap: round; }
 .board-connections line:after { stroke-width: 1px; }
 .board-connections .secret-line { fill: none; stroke: rgba(213,170,98,.2); stroke-width: 2; stroke-dasharray: 7 8; }
-.board-room { position: absolute; z-index: 2; width: 166px; height: 104px; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(213,170,98,.38); background: radial-gradient(circle at 50% 20%,rgba(213,170,98,.09),transparent 60%),linear-gradient(145deg,#212a31,#131a21); box-shadow: inset 0 0 0 5px #10161c,inset 0 0 0 6px rgba(213,170,98,.11),0 12px 30px rgba(0,0,0,.36); }
+.board-room { position: absolute; z-index: 2; width: 202px; height: 160px; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid transparent; background: transparent; box-shadow: none; }
 .board-room:before,.board-room:after { content: ""; position: absolute; width: 12px; height: 12px; border-color: var(--gold); opacity: .48; }
 .board-room:before { left: 9px; top: 9px; border-left: 1px solid; border-top: 1px solid; }
 .board-room:after { right: 9px; bottom: 9px; border-right: 1px solid; border-bottom: 1px solid; }
-.board-room strong { max-width: 130px; color: #ddd8cf; font: 17px "Song Myung",serif; text-align: center; }
-.board-room small { margin-top: 6px; color: #9d7d4d; font-size: 9px; letter-spacing: .16em; }
-.room-corner { position: absolute; left: 12px; bottom: 10px; color: #4f575e; font: 9px ui-monospace,monospace; }
-.corridor-node { position: absolute; z-index: 3; width: 27px; height: 27px; transform: translate(-50%,-50%); display: grid; place-items: center; border: 1px solid #5b5649; border-radius: 50%; background: #192127; box-shadow: 0 3px 8px rgba(0,0,0,.5); }
+.board-room:not(.is-reachable):before,.board-room:not(.is-reachable):after { opacity: 0; }
+.board-room strong,.board-room small,.board-room em,.room-corner { opacity: 0; pointer-events: none; }
+.board-room strong { max-width: 150px; color: #fff4d4; font: 17px "Song Myung",serif; text-align: center; text-shadow: 0 2px 7px #000; }
+.board-room small { margin-top: 6px; color: #e7c77f; font-size: 9px; letter-spacing: .16em; }
+.board-room em { margin-top: 7px; border: 1px solid rgba(255,236,183,.55); border-radius: 99px; padding: 4px 8px; background: rgba(11,16,20,.82); color: #ffedb5; font-size: 10px; font-style: normal; font-weight: 800; letter-spacing: .05em; }
+.corridor-node { position: absolute; z-index: 3; width: 36px; height: 36px; transform: translate(-50%,-50%); display: grid; place-items: center; border: 1px solid transparent; border-radius: 50%; background: transparent; box-shadow: none; }
 .corridor-node::after { content:""; position:absolute; inset:-9px; }
-.corridor-node span { width: 7px; height: 7px; border: 1px solid #82755e; border-radius: 50%; }
+.corridor-node span { opacity: 0; width: auto; height: auto; border: 0; color: #1a140a; font-size: 8px; font-weight: 900; }
 .player-piece { position: absolute; z-index: 8; transform: translate(-50%,-72%); display: grid; justify-items: center; pointer-events: none; transition: left .52s cubic-bezier(.2,.78,.2,1),top .52s cubic-bezier(.2,.78,.2,1); }
 .player-piece > span { width: 31px; height: 38px; display: grid; place-items: center; border: 2px solid color-mix(in srgb,var(--piece-color) 60%,white); border-radius: 50% 50% 43% 43%; background: linear-gradient(145deg,color-mix(in srgb,var(--piece-color) 80%,white),var(--piece-color)); color: #fff; box-shadow: 0 4px 0 color-mix(in srgb,var(--piece-color) 55%,black),0 8px 15px rgba(0,0,0,.5); font: 9px ui-monospace,monospace; }
 .player-piece.is-me > span { box-shadow: 0 0 0 3px #e4c98f,0 4px 0 color-mix(in srgb,var(--piece-color) 55%,black),0 0 18px rgba(228,201,143,.65); }
@@ -174,9 +176,10 @@
 .sound-toggle[aria-pressed="false"] { color: #727980 !important; }
 .board-room:disabled,.corridor-node:disabled { opacity: 1; }
 .board-room.is-reachable,.corridor-node.is-reachable { cursor: pointer; animation: reachable-pulse 1.35s ease-in-out infinite; }
-.board-room.is-reachable { border-color: #e7c77f; box-shadow: inset 0 0 0 5px #10161c,inset 0 0 0 6px rgba(231,199,127,.45),0 0 30px rgba(231,199,127,.42); }
-.corridor-node.is-reachable { border-color: #f1d18a; background: #d5aa62; box-shadow: 0 0 0 6px rgba(213,170,98,.15),0 0 22px rgba(213,170,98,.65); }
-.corridor-node.is-reachable span { border-color: #352b1c; background: #4c3c24; }
+.board-room.is-reachable { border-color: #ffe19c; background: radial-gradient(ellipse at center,rgba(255,226,145,.32),rgba(255,204,92,.07) 50%,transparent 72%); box-shadow: inset 0 0 0 2px rgba(255,234,180,.65),0 0 0 6px rgba(236,186,79,.16),0 0 34px rgba(255,204,92,.7); }
+.board-room.is-reachable strong,.board-room.is-reachable em { opacity: 1; }
+.corridor-node.is-reachable { border-color: #f1d18a; background: #f2c75f; box-shadow: 0 0 0 6px rgba(213,170,98,.18),0 0 24px rgba(255,217,125,.78); }
+.corridor-node.is-reachable span { opacity: 1; }
 @keyframes reachable-pulse { 50% { filter: brightness(1.25); } }
 
 @media(max-width:720px){

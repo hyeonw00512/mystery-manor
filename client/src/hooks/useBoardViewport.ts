@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
+import { board } from "@mystery/shared";
 
 interface Transform { x: number; y: number; scale: number; }
-const STAGE_WIDTH = 1000;
-const STAGE_HEIGHT = 700;
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 export function useBoardViewport() {
@@ -14,8 +13,8 @@ export function useBoardViewport() {
   const reset = useCallback(() => {
     const element = viewportRef.current;
     if (!element) return;
-    const scale = clamp(Math.min(element.clientWidth / STAGE_WIDTH, element.clientHeight / STAGE_HEIGHT) * .94, .38, 1.15);
-    setTransform({ x: (element.clientWidth - STAGE_WIDTH * scale) / 2, y: (element.clientHeight - STAGE_HEIGHT * scale) / 2, scale });
+    const scale = clamp(Math.min(element.clientWidth / board.width, element.clientHeight / board.height) * .94, .38, 1.15);
+    setTransform({ x: (element.clientWidth - board.width * scale) / 2, y: (element.clientHeight - board.height * scale) / 2, scale });
   }, []);
 
   useEffect(() => {

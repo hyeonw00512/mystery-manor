@@ -5,27 +5,27 @@ const room = (id: string, name: string, locationId: string, x: number, y: number
 const corridor = (id: string, x: number, y: number): NodeSeed => ({ id, type: "CORRIDOR", x, y });
 
 const nodeSeeds: NodeSeed[] = [
-  room("room_archive", "비밀 기록실", "location_archive", 100, 80, "room_dining"),
-  room("room_greenhouse", "유리 온실", "location_greenhouse", 500, 70),
-  room("room_gallery", "밤의 화랑", "location_gallery", 900, 80, "room_library"),
-  room("room_observatory", "천문 관측실", "location_observatory", 100, 350),
-  room("room_courtyard", "안개 중정", "location_courtyard", 500, 350),
-  room("room_workshop", "기계 작업실", "location_workshop", 900, 350),
-  room("room_library", "원형 서고", "location_library", 100, 620, "room_gallery"),
-  room("room_conservatory", "음악 연습실", "location_conservatory", 500, 630),
-  room("room_dining", "연회 식당", "location_dining", 900, 620, "room_archive"),
-  corridor("corridor_top_left_1", 235, 80), corridor("corridor_top_left_2", 360, 80),
-  corridor("corridor_top_right_1", 640, 80), corridor("corridor_top_right_2", 765, 80),
-  corridor("corridor_left_top_1", 100, 180), corridor("corridor_left_top_2", 100, 255),
-  corridor("corridor_left_bottom_1", 100, 445), corridor("corridor_left_bottom_2", 100, 520),
-  corridor("corridor_right_top_1", 900, 180), corridor("corridor_right_top_2", 900, 255),
-  corridor("corridor_right_bottom_1", 900, 445), corridor("corridor_right_bottom_2", 900, 520),
-  corridor("corridor_mid_left_1", 235, 350), corridor("corridor_mid_left_2", 360, 350),
-  corridor("corridor_mid_right_1", 640, 350), corridor("corridor_mid_right_2", 765, 350),
-  corridor("corridor_vertical_top_1", 500, 175), corridor("corridor_vertical_top_2", 500, 255),
-  corridor("corridor_vertical_bottom_1", 500, 445), corridor("corridor_vertical_bottom_2", 500, 525),
-  corridor("corridor_bottom_left_1", 235, 620), corridor("corridor_bottom_left_2", 360, 620),
-  corridor("corridor_bottom_right_1", 640, 620), corridor("corridor_bottom_right_2", 765, 620)
+  room("room_archive", "비밀 기록실", "location_archive", 185, 165, "room_dining"),
+  room("room_greenhouse", "유리 온실", "location_greenhouse", 500, 145),
+  room("room_gallery", "밤의 화랑", "location_gallery", 820, 165, "room_library"),
+  room("room_observatory", "천문 관측실", "location_observatory", 185, 485),
+  room("room_courtyard", "안개 중정", "location_courtyard", 500, 455),
+  room("room_workshop", "기계 작업실", "location_workshop", 820, 485),
+  room("room_library", "원형 서고", "location_library", 185, 790, "room_gallery"),
+  room("room_conservatory", "음악 연습실", "location_conservatory", 500, 790),
+  room("room_dining", "연회 식당", "location_dining", 820, 790, "room_archive"),
+  corridor("corridor_top_left_1", 310, 165), corridor("corridor_top_left_2", 395, 165),
+  corridor("corridor_top_right_1", 605, 165), corridor("corridor_top_right_2", 700, 165),
+  corridor("corridor_left_top_1", 185, 280), corridor("corridor_left_top_2", 185, 380),
+  corridor("corridor_left_bottom_1", 185, 600), corridor("corridor_left_bottom_2", 185, 690),
+  corridor("corridor_right_top_1", 820, 280), corridor("corridor_right_top_2", 820, 380),
+  corridor("corridor_right_bottom_1", 820, 600), corridor("corridor_right_bottom_2", 820, 690),
+  corridor("corridor_mid_left_1", 310, 455), corridor("corridor_mid_left_2", 395, 455),
+  corridor("corridor_mid_right_1", 605, 455), corridor("corridor_mid_right_2", 700, 455),
+  corridor("corridor_vertical_top_1", 500, 270), corridor("corridor_vertical_top_2", 500, 375),
+  corridor("corridor_vertical_bottom_1", 500, 600), corridor("corridor_vertical_bottom_2", 500, 690),
+  corridor("corridor_bottom_left_1", 310, 790), corridor("corridor_bottom_left_2", 395, 790),
+  corridor("corridor_bottom_right_1", 605, 790), corridor("corridor_bottom_right_2", 700, 790)
 ];
 
 export const boardEdges: ReadonlyArray<readonly [string, string]> = [
@@ -55,7 +55,7 @@ export const board: BoardDefinition = {
   id: "midnight_manor_v1",
   name: "흑야 저택",
   width: 1000,
-  height: 700,
+  height: 1000,
   nodes: nodeSeeds.map((node) => ({ ...node, connections: connections.get(node.id) ?? [] }))
 };
 
