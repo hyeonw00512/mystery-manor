@@ -6,7 +6,7 @@ export function CharacterPicker() {
   const { room, session, selectCharacter } = useGame();
   const me = room?.players.find((player) => player.playerId === session?.playerId);
   const taken = new Set(room?.players.filter((player) => player.playerId !== me?.playerId).map((player) => player.characterId));
-  return <section className="panel character-panel"><div className="section-heading"><div><span className="eyebrow">조사관 배정</span><h2>캐릭터 선택</h2></div><span className="step-count">01</span></div><div className="character-grid">{characters.map((character) => {
+  return <section className="panel character-panel"><div className="section-heading"><div><span className="eyebrow">조사관 배정</span><h2>캐릭터 선택</h2></div><span className="step-count">01</span></div><p className="character-choice-note"><b>능력 차이는 없습니다.</b> 캐릭터마다 색상과 시작 위치만 다르므로 마음에 드는 조사관을 선택하세요.</p><div className="character-grid">{characters.map((character) => {
     const disabled = taken.has(character.id); const selected = me?.characterId === character.id;
     return <button key={character.id} type="button" className={`character-card ${selected ? "selected" : ""}`} disabled={disabled || me?.ready} onClick={() => void selectCharacter(character.id)} style={{ "--character-color": character.color } as React.CSSProperties}>
       <CharacterPortrait className="portrait" characterId={character.id} initials={character.initials}/><span className="character-copy"><strong>{character.name}</strong><small>{disabled ? "선택됨" : character.role}</small></span>{selected && <span className="selected-mark">✓</span>}
