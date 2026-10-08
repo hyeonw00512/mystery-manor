@@ -53,7 +53,7 @@ for (const [from, to] of boardEdges) { connections.get(from)?.push(to); connecti
 
 export const board: BoardDefinition = {
   id: "midnight_manor_v1",
-  name: "흑야 저택",
+  name: "저택 추리 (Clue)",
   width: 1000,
   height: 1000,
   nodes: nodeSeeds.map((node) => ({ ...node, connections: connections.get(node.id) ?? [] }))

@@ -9,7 +9,7 @@
 ```bash
 git init
 git add .
-git commit -m "Initial Mystery Manor deployment"
+git commit -m "Initial Manor Mystery (Clue) deployment"
 git branch -M main
 git remote add origin https://github.com/계정명/저장소명.git
 git push -u origin main

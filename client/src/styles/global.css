@@ -38,7 +38,7 @@
 .mobile-orientation-note { display:none; }
 .board-stage { position: absolute; left: 0; top: 0; overflow: hidden; transform-origin: 0 0; background: #071017 url("/manor-board-v2.png") center/100% 100% no-repeat; box-shadow: inset 0 0 120px rgba(0,0,0,.72),0 30px 80px rgba(0,0,0,.45); }
 .board-stage:before { content: ""; position: absolute; inset: 14px; z-index: 1; border: 1px solid rgba(222,181,95,.35); box-shadow: inset 0 0 0 4px rgba(5,9,14,.3); pointer-events: none; }
-.board-stage:after { content: "흑야 저택 · 사건 지도"; position: absolute; left: 28px; bottom: 25px; z-index: 4; color: rgba(241,213,151,.72); font: 11px "Song Myung",serif; letter-spacing: .18em; text-shadow: 0 2px 7px #000; }
+.board-stage:after { content: "저택 추리 (Clue) · 사건 지도"; position: absolute; left: 28px; bottom: 25px; z-index: 4; color: rgba(241,213,151,.72); font: 11px "Song Myung",serif; letter-spacing: .18em; text-shadow: 0 2px 7px #000; }
 .board-connections { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .board-connections line { stroke: rgba(241,218,163,.16); stroke-width: 5; stroke-linecap: round; }
 .board-connections line:after { stroke-width: 1px; }
